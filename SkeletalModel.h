@@ -14,7 +14,7 @@
 #include "GL/freeglut.h"
 #include "FL/gl.h"
 #else
-#include <GL/glut.h>
+#include <FL/glut.h>
 #include <FL/gl.h>
 #endif
 #include <iostream>

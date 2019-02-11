@@ -5,7 +5,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
 #include <FL/gl.h>
-#include <GL/glu.h>
+#include <FL/glu.h>
 #include <cstdio>
 
 // Accessing the values of sliders is a very lengthy function call.
