@@ -107,6 +107,7 @@ void ModelerApplication::Init( int argc, char* argv[],
 	slider->range(controls[i].m_minimum, controls[i].m_maximum);
 	slider->step(controls[i].m_stepsize);
 	slider->value(controls[i].m_value);
+	slider->precision(2); // I think 2 digits is precise enough..
 	slider->hide();
 	m_controlValueSliders[i] = slider;
 	slider->
