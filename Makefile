@@ -1,26 +1,36 @@
-#INCFLAGS = -I /mit/6.837/public/include/vecmath
-#INCFLAGS += -I /mit/glut/include
-#LINKFLAGS = -L /mit/6.837/public/lib -l vecmath
-#LINKFLAGS += -L /mit/glut/lib -lGL -lGLU -lglut -lX11 -lXi
+# GNU makefile for those who use Linux. May need some changes to work on
+# your own personal machine.
+#
+# Adapted from the original MIT assigment:
+# - Naturally, we do not have "/mit/6.837/public/" so we need local build
+# - Added the full source code of the vecmath library as given in 2012.
+# - Build libvecmath.a to current working directory and link from there.
+# - Updated also clean target; added "veryclean" to rid of library.
+#
+.PHONY: all clean veryclean
 INCFLAGS  = -I /usr/include/GL
-INCFLAGS += -I /mit/6.837/public/include/vecmath
-#INCFLAGS += -I ~/vecmath/include
+INCFLAGS += -I ./vecmath/include
 
 LINKFLAGS  = -lglut -lGL -lGLU
-LINKFLAGS += -L /mit/6.837/public/lib -lvecmath
-#LINKFLAGS += -L ~/vecmath/lib -lvecmath
+LINKFLAGS += -L ./ -lvecmath
 LINKFLAGS += -lfltk -lfltk_gl
 
-CFLAGS    = -g
-CFLAGS    += -DSOLN
+CFLAGS    = -g -Wall -DSOLN
 CC        = g++
 SRCS      = bitmap.cpp camera.cpp MatrixStack.cpp modelerapp.cpp modelerui.cpp ModelerView.cpp Joint.cpp SkeletalModel.cpp Mesh.cpp main.cpp
 OBJS      = $(SRCS:.cpp=.o)
 PROG      = a2
 
+VECMATHSRC= Matrix2f.cpp  Matrix3f.cpp  Matrix4f.cpp  Quat4f.cpp  Vector2f.cpp  Vector3f.cpp  Vector4f.cpp
+VECMATHOBJ=$(patsubst %.cpp,%.o,$(VECMATHSRC))
+
 all: $(SRCS) $(PROG)
 
-$(PROG): $(OBJS)
+libvecmath.a: $(addprefix vecmath/src/,$(VECMATHSRC))
+	g++ -c $(CFLAGS) $(INCFLAGS) $(addprefix vecmath/src/,$(VECMATHSRC))
+	ar crf $@ $(VECMATHOBJ)
+
+$(PROG): $(OBJS) libvecmath.a
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LINKFLAGS)
 
 .cpp.o:
@@ -30,7 +40,10 @@ depend:
 	makedepend $(INCFLAGS) -Y $(SRCS)
 
 clean:
-	rm $(OBJS) $(PROG)
+	-rm $(OBJS) $(PROG) $(VECMATHOBJ) *~
+
+veryclean: clean
+	-rm libvecmath.a
 
 bitmap.o: bitmap.h
 camera.o: camera.h
