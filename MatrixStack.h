@@ -7,15 +7,15 @@
 class MatrixStack
 {
 public:
-	MatrixStack();
-	void clear();
-	Matrix4f top();
-	void push( const Matrix4f& m );
-	void pop();
+    MatrixStack();
+    void clear();
+    Matrix4f top();
+    void push(const Matrix4f& m);
+    void pop();
 
 private:
 
-	std::vector< Matrix4f > m_matrices;
+    std::vector< Matrix4f > m_matrices;
 
 };
 
