@@ -11,7 +11,11 @@
 INCFLAGS  = -I /usr/include/GL
 INCFLAGS += -I ./vecmath/include
 
-LINKFLAGS  = -lglut -lGL -lGLU
+ifeq ($(UNAME_S),Darwin)
+	LINKFLAGS = -framework GLUT -framework OpenGL
+else
+	LINKFLAGS = -lglut -lGL -lGLU
+endif
 LINKFLAGS += -L ./ -lvecmath
 LINKFLAGS += -lfltk -lfltk_gl
 
