@@ -8,22 +8,31 @@
 # - Updated also clean target; added "veryclean" to rid of library.
 #
 .PHONY: all clean veryclean
-INCFLAGS  = -I /usr/include/GL
+INCFLAGS  = $(shell pkg-config --cflags gl)
 INCFLAGS += -I ./vecmath/include
+INCFLAGS += $(shell fltk-config --cxxflags)
 
-ifeq ($(UNAME_S),Darwin)
+ifeq ($(shell uname -s),Darwin)
 	LINKFLAGS = -framework GLUT -framework OpenGL
+	ARFLAGS = cr
 else
 	LINKFLAGS = -lglut -lGL -lGLU
+	ARFLAGS = crf
 endif
-LINKFLAGS += -L ./ -lvecmath
-LINKFLAGS += -lfltk -lfltk_gl
+
+LINKFLAGS += -L ./ -lvecmath $(shell fltk-config --use-glut --ldflags)
 
 CFLAGS    = -g -Wall -DSOLN
 CC        = g++
 SRCS      = bitmap.cpp camera.cpp MatrixStack.cpp modelerapp.cpp modelerui.cpp ModelerView.cpp Joint.cpp SkeletalModel.cpp Mesh.cpp main.cpp
 OBJS      = $(SRCS:.cpp=.o)
 PROG      = a2
+
+ifeq ($(shell uname -s),Darwin)
+	CFLAGS +=  -DGL_SILENCE_DEPRECATION
+endif
+
+
 
 VECMATHSRC= Matrix2f.cpp  Matrix3f.cpp  Matrix4f.cpp  Quat4f.cpp  Vector2f.cpp  Vector3f.cpp  Vector4f.cpp
 VECMATHOBJ=$(patsubst %.cpp,%.o,$(VECMATHSRC))
@@ -32,7 +41,7 @@ all: $(SRCS) $(PROG)
 
 libvecmath.a: $(addprefix vecmath/src/,$(VECMATHSRC))
 	g++ -c $(CFLAGS) $(INCFLAGS) $(addprefix vecmath/src/,$(VECMATHSRC))
-	ar crf $@ $(VECMATHOBJ)
+	ar $(ARFLAGS) $@ $(VECMATHOBJ)
 
 $(PROG): $(OBJS) libvecmath.a
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LINKFLAGS)
